@@ -1,7 +1,7 @@
-import 'package:firebase_auth/firebase_auth.dart';
+// import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
+// import 'package:flutter/rendering.dart';
 import 'package:lesson3/model/constant.dart';
 import 'package:lesson3/viewscreen/addnewphotomemo_screen.dart';
 import 'package:lesson3/viewscreen/internalerror_screen.dart';
@@ -41,8 +41,8 @@ class Lesson3App extends StatelessWidget {
             var user = argument[ARGS.USER];
             return AddNewPhotoMemoScreen(user: user);
           }
+        },
       },
     );
   }
-  
 }
