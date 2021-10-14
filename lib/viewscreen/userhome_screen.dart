@@ -3,6 +3,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:lesson3/controller/firebaseauth_controller.dart';
 import 'package:lesson3/model/constant.dart';
+import 'package:lesson3/viewscreen/addnewphotomemo_screen.dart';
 
 class UserHomeScreen extends StatefulWidget {
   static const routeName = '/userHomeScreen';
@@ -35,26 +36,34 @@ class _UserHomeState extends State<UserHomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('User Home'),
-      ),
-      drawer: Drawer(
-        child: ListView(
-          children: [
-            UserAccountsDrawerHeader(
-              accountName: Text(widget.displayName),
-              accountEmail: Text(widget.email),
-            ),
-            ListTile(
-              leading: Icon(Icons.exit_to_app),
-              title: Text('Sign Out'),
-              onTap: con.signOut,
-            ),
-          ],
+    return WillPopScope(
+        onWillPop: () => Future.value(false), //disable back button
+          child: Scaffold(
+        appBar: AppBar(
+          title: Text('User Home'),
         ),
+        drawer: Drawer(
+          child: ListView(
+            children: [
+              UserAccountsDrawerHeader(
+                accountName: Text(widget.displayName),
+                accountEmail: Text(widget.email),
+              ),
+              ListTile(
+                leading: Icon(Icons.exit_to_app),
+                title: Text('Sign Out'),
+                onTap: con.signOut,
+              ),
+            ],
+          ),
+        ),
+        floatingActionButton: FloatingActionButton(
+          child: Icon(Icons.add),
+          onPressed: con.addButton,
+        ),
+        body: Text('user home: ${widget.user.email}'),
+
       ),
-      body: Text('user home: ${widget.user.email}'),
     );
   }
 }
@@ -62,6 +71,16 @@ class _UserHomeState extends State<UserHomeScreen> {
 class _Controller {
   late _UserHomeState state;
   _Controller(this.state);
+
+  void addButton() {
+    Navigator.pushNamed(//
+      state.context,
+      AddNewPhotoMemoScreen.routeName,
+      arguments: {
+        ARGS.USER: state.widget.user,
+      }
+    );
+  }
 
   Future<void> signOut() async {
     try {
