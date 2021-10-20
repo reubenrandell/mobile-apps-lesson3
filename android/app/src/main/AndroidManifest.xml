@@ -1,5 +1,10 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="edu.uco.rrandell.mobileapps.lesson3">
+    <queries>
+      <intent>
+        <action android:name="android.media.action.IMAGE_CAPTURE" />
+      </intent>
+    </queries>
    <application
         android:label="lesson3"
         android:icon="@mipmap/ic_launcher">

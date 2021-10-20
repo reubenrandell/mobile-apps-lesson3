@@ -3,7 +3,11 @@ import 'dart:io';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:lesson3/controller/cloudstorage_controller.dart';
+import 'package:lesson3/model/constant.dart';
 import 'package:lesson3/model/photomemo.dart';
+import 'package:lesson3/viewscreen/view/mydialog.dart';
 
 class AddNewPhotoMemoScreen extends StatefulWidget {
   static const routeName = '/addNewPhotoMemoScreen';
@@ -78,6 +82,8 @@ class _AddNewPhotoMemoState extends State<AddNewPhotoMemoScreen> {
                   ),
                 ],
               ),
+              con.progressMessage == null ? SizedBox(height: 1.0,) :
+                Text(con.progressMessage!, style: Theme.of(context).textTheme.headline6,),
               TextFormField(
                 //
                 decoration: InputDecoration(hintText: 'Title'),
@@ -113,19 +119,61 @@ class _AddNewPhotoMemoState extends State<AddNewPhotoMemoScreen> {
 class _Controller {
   late _AddNewPhotoMemoState state;
   PhotoMemo tempMemo = PhotoMemo();
+  String? progressMessage;
 
   _Controller(this.state);
 
-  void save() {
+  void save() async {
     FormState? currentState = state.formKey.currentState;
     if (currentState == null || !currentState.validate()) return;
     currentState.save();
-    print(
-        '====== tempMemo: ${tempMemo.title} ${tempMemo.memo} ${tempMemo.sharedWith}');
+
+    if (state.photo == null) {
+      MyDialog.showSnackBar(
+        context: state.context,
+        message: 'Photo not selected',
+      );
+      return;
+    }
+
+    try {
+      Map photoInfo = await CloudStorageController.uploadPhotoFile(
+          photo: state.photo!,
+          uid: state.widget.user.uid,
+          listener: (progress) {
+            state.render((){
+              if (progress == 100)
+                progressMessage = null;
+              else
+                progressMessage = 'Uploading $progress %';
+            });
+          });
+      print('===== photo filename: ${photoInfo[ARGS.Filename]}');
+      print('===== photo URL: ${photoInfo[ARGS.DownloadURL]}');
+    } catch (e) {
+      if (Constant.DEV) print('============= Add new photomemofailed: $e');
+      MyDialog.showSnackBar(
+        context: state.context,
+        message: 'Add new photomemo failed: $e',
+      );
+    }
   }
 
-  void getPhoto(PhotoSource source) {
-    print('======== photo source: $source');
+  void getPhoto(PhotoSource source) async {
+    try {
+      var imageSource = source == PhotoSource.CAMERA
+          ? ImageSource.camera
+          : ImageSource.gallery;
+      XFile? image = await ImagePicker().pickImage(source: imageSource);
+      if (image == null) return;
+      state.render(() => state.photo = File(image.path));
+    } catch (e) {
+      if (Constant.DEV) print('========= failed to get a pic: $e');
+      MyDialog.showSnackBar(
+        context: state.context,
+        message: 'Failed to get a picture: $e',
+      );
+    }
   }
 
   void saveTitle(String? value) {
