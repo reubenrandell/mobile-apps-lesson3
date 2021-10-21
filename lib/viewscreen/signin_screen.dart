@@ -1,7 +1,9 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:lesson3/controller/firebaseauth_controller.dart';
+import 'package:lesson3/controller/firestore_controller.dart';
 import 'package:lesson3/model/constant.dart';
+import 'package:lesson3/model/photomemo.dart';
 
 import 'userhome_screen.dart';
 import 'view/mydialog.dart';
@@ -112,6 +114,7 @@ class _Controller {
     currentState.save();
 
     User? user;
+    MyDialog.circularProgressStart(state.context);
 
     try {
       if (email == null || password == null) {
@@ -119,14 +122,23 @@ class _Controller {
       }
       user = await FirebaseAuthController.signIn(email: email!, password: password!);
       // print('========= ${user?.email}');
+
+      List<PhotoMemo> photoMemoList = await FirestoreController.getPhotoMemoList(email: email!);
+
+      MyDialog.circularProgressStop(state.context);
+
+
       Navigator.pushNamed(
         state.context,
         UserHomeScreen.routeName,
         arguments: {
           ARGS.USER: user,
-        }
+          ARGS.PhotoMemoList: photoMemoList,
+        },
       );
     } catch (e) {
+      MyDialog.circularProgressStop(state.context);
+      
       if (Constant.DEV) print('========= signIn error: $e');
       MyDialog.showSnackBar(
         context: state.context,

@@ -51,6 +51,27 @@ class PhotoMemo {
     };
   }
 
+  static PhotoMemo? fromFirestoreDoc({required Map<String, dynamic> doc, required String docId}) {
+    for (var key in doc.keys) {
+      if (doc[key] == null) return null;
+    }
+
+    return PhotoMemo(
+      docId: docId,
+      createdBy: doc[CREATED_BY] ??= 'N/A',
+      title: doc[TITLE] ??= 'N/A',
+      memo: doc[MEMO] ??= 'N/A',
+      photoFilename: doc[PHOTO_FILENAME] ??= 'N/A',
+      photoURL: doc[PHOTO_URL] ??= 'N/A',
+      sharedWith: doc[SHARED_WITH] ??= [],
+      imageLabels: doc[IMAGE_LABELS] ??= [],
+      timestamp: doc[TIMESTAMP] != null ?
+        DateTime.fromMillisecondsSinceEpoch(doc[TIMESTAMP].millisecondsSinceEpoch)
+        : DateTime.now(),
+
+    );
+  }
+
   static String? validateTitle(String? value) {
     return value == null || value.trim().length < 3 ? 'Title too short' : null;
   }
