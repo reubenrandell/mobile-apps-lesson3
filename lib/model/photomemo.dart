@@ -38,6 +38,32 @@ class PhotoMemo {
     this.imageLabels = imageLabels == null ? [] : [...imageLabels];
   }
 
+  PhotoMemo.clone(PhotoMemo p) {
+    this.docId = p.docId;
+    this.createdBy = p.createdBy;
+    this.title = p.title;
+    this.memo = p.memo;
+    this.photoFilename = p.photoFilename;
+    this.photoURL = p.photoURL;
+    this.timestamp = p.timestamp;
+    this.sharedWith = [...p.sharedWith];
+    this.imageLabels = [...p.imageLabels];
+  }
+
+  void assign(PhotoMemo p) {
+    this.docId = p.docId;
+    this.createdBy = p.createdBy;
+    this.title = p.title;
+    this.memo = p.memo;
+    this.photoFilename = p.photoFilename;
+    this.photoURL = p.photoURL;
+    this.timestamp = p.timestamp;
+    this.sharedWith.clear();
+    this.sharedWith.addAll(p.sharedWith);
+    this.imageLabels.clear();
+    this.imageLabels.addAll(p.imageLabels);
+  }
+
   Map<String, dynamic> toFirestoreDoc() {
     return {
       TITLE: this.title,
