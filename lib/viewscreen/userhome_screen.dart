@@ -191,7 +191,6 @@ class _Controller {
         state.render(() {
           photoMemoList.removeAt(delIndexes[i]);
         });
-        photoMemoList.removeAt(delIndexes[i]);
       } catch (e) {
         if (Constant.DEV) print('======== failed to delete photomemo: $e');
         MyDialog.showSnackBar(
