@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 // import 'package:flutter/rendering.dart';
 import 'package:lesson3/model/constant.dart';
 import 'package:lesson3/viewscreen/addnewphotomemo_screen.dart';
+import 'package:lesson3/viewscreen/comment_screen.dart';
 import 'package:lesson3/viewscreen/detailedview_screen.dart';
 import 'package:lesson3/viewscreen/internalerror_screen.dart';
 import 'package:lesson3/viewscreen/sharedwith_screen.dart';
@@ -77,6 +78,17 @@ class Lesson3App extends StatelessWidget {
           }
         },
         SignUpScreen.routeName: (context) => SignUpScreen(),
+        CommentScreen.routeName: (context) {
+          Object? args = ModalRoute.of(context)?.settings.arguments;
+          if (args == null) {
+            return InternalErrorScreen('args is null at CommentScreen');
+          } else {
+            var argument = args as Map;
+            var user = argument[ARGS.USER];
+            var photoMemo = argument[ARGS.OnePhotoMemo];
+            return CommentScreen(user: user, photoMemo: photoMemo);
+          }
+        },
       },
     );
   }

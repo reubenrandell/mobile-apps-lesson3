@@ -1,6 +1,8 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:lesson3/model/constant.dart';
 import 'package:lesson3/model/photomemo.dart';
+import 'package:lesson3/viewscreen/comment_screen.dart';
 import 'package:lesson3/viewscreen/view/webimage.dart';
 
 class SharedWithScreen extends StatefulWidget {
@@ -65,6 +67,7 @@ class _SharedWithState extends State<SharedWithScreen> {
                     Text('Created at: ${photoMemo.timestamp}'),
                     Text('Shared With: ${photoMemo.sharedWith}'),
                     Text('Image Labels: ${photoMemo.imageLabels}'),
+                    IconButton(onPressed: () => con.comments(photoMemo), icon: Icon(Icons.comment)),
 
 
                   ],
@@ -80,4 +83,15 @@ class _SharedWithState extends State<SharedWithScreen> {
 class _Controller {
   late _SharedWithState state;
   _Controller(this.state);
+
+  void comments(PhotoMemo photoMemo) async {
+    await Navigator.pushNamed(
+        state.context,
+        CommentScreen.routeName,
+        arguments: {
+          ARGS.USER: state.widget.user,
+          ARGS.OnePhotoMemo: photoMemo,
+        });
+    state.render(() {});
+  }
 }

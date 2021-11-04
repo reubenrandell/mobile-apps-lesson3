@@ -1,3 +1,5 @@
+import 'package:lesson3/model/comment.dart';
+
 enum PhotoSource { CAMERA, GALLERY }
 
 class PhotoMemo {
@@ -10,6 +12,7 @@ class PhotoMemo {
   static const TIMESTAMP = 'timestamp';
   static const SHARED_WITH = 'sharedwith';
   static const IMAGE_LABELS = 'imagelabels';
+  static const COMMENTS = 'comments';
 
   String? docId; //Firestore auto generated doc id
   late String createdBy; //email == user id
@@ -21,6 +24,9 @@ class PhotoMemo {
   DateTime? timestamp;
   late List<dynamic> sharedWith; // list of emails
   late List<dynamic> imageLabels; //ML image labels
+  late List<dynamic> comments;
+  //Add Comment object; Comment includes user left by, message, etc.
+
   PhotoMemo({
     this.docId,
     this.createdBy = '',
@@ -31,11 +37,13 @@ class PhotoMemo {
     this.timestamp,
     List<dynamic>? sharedWith,
     List<dynamic>? imageLabels,
+    List<dynamic>? comments,
   }) {
     this.sharedWith = sharedWith == null
         ? []
         : [...sharedWith]; //copies contents of sharedWith
     this.imageLabels = imageLabels == null ? [] : [...imageLabels];
+    this.comments = comments == null ? [] : [...comments];
   }
 
   PhotoMemo.clone(PhotoMemo p) {
@@ -48,6 +56,7 @@ class PhotoMemo {
     this.timestamp = p.timestamp;
     this.sharedWith = [...p.sharedWith];
     this.imageLabels = [...p.imageLabels];
+    this.comments = [...p.comments];
   }
 
   void assign(PhotoMemo p) {
@@ -62,6 +71,8 @@ class PhotoMemo {
     this.sharedWith.addAll(p.sharedWith);
     this.imageLabels.clear();
     this.imageLabels.addAll(p.imageLabels);
+    this.comments.clear();
+    this.comments.addAll(p.comments);
   }
 
   Map<String, dynamic> toFirestoreDoc() {
@@ -74,6 +85,7 @@ class PhotoMemo {
       TIMESTAMP: this.timestamp,
       SHARED_WITH: this.sharedWith,
       IMAGE_LABELS: this.imageLabels,
+      COMMENTS: this.comments,
     };
   }
 
@@ -91,6 +103,7 @@ class PhotoMemo {
       photoURL: doc[PHOTO_URL] ??= 'N/A',
       sharedWith: doc[SHARED_WITH] ??= [],
       imageLabels: doc[IMAGE_LABELS] ??= [],
+      comments: doc[COMMENTS] ??= [],
       timestamp: doc[TIMESTAMP] != null ?
         DateTime.fromMillisecondsSinceEpoch(doc[TIMESTAMP].millisecondsSinceEpoch)
         : DateTime.now(),

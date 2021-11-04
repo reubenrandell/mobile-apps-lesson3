@@ -1,10 +1,20 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:lesson3/model/comment.dart';
 import 'package:lesson3/model/constant.dart';
 import 'package:lesson3/model/photomemo.dart';
 
 class FirestoreController {
 
   static Future<String> addPhotoMemo({
+    required PhotoMemo photoMemo,
+
+  }) async {
+    DocumentReference ref = await FirebaseFirestore.instance.collection(Constant.PHOTOMEMO_COLLECTION)
+      .add(photoMemo.toFirestoreDoc());
+    return ref.id;
+  }
+
+   static Future<String> addComment({
     required PhotoMemo photoMemo,
 
   }) async {
@@ -88,6 +98,26 @@ class FirestoreController {
     querySnapshot.docs.forEach((doc) {
       var p = PhotoMemo.fromFirestoreDoc(doc: doc.data() as Map<String, dynamic>, docId: doc.id);
       if (p != null) results.add(p);
+    });
+    return results;
+  }
+
+  static Future<List<Comment>> getPhotoMemoListComments({
+    required String createdBy,
+  }) async {
+    QuerySnapshot querySnapshot = await FirebaseFirestore.instance
+      .collection(Constant.PHOTOMEMO_COLLECTION)
+      .where(PhotoMemo.CREATED_BY, isEqualTo: createdBy)
+      .orderBy(PhotoMemo.TIMESTAMP, descending: true)
+      .get();
+    var results = <Comment>[];
+    querySnapshot.docs.forEach((doc) {
+      var p = PhotoMemo.fromFirestoreDoc(doc: doc.data() as Map<String, dynamic>, docId: doc.id);
+      if (p != null)
+        p.comments.forEach((element) {
+          results.add(element);
+      });
+      //if (p != null) results.add(p);
     });
     return results;
   }

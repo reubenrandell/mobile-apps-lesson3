@@ -170,6 +170,7 @@ class _Controller {
             ARGS.PhotoMemoList: photoMemoList,
             ARGS.USER: state.widget.user,
           });
+          if (Constant.DEV) print('========== sharedWith error: PAST SECOND LINE');
       Navigator.of(state.context).pop();
     } catch (e) {
       if (Constant.DEV) print('========== sharedWith error: $e');
@@ -179,6 +180,8 @@ class _Controller {
       );
     }
   }
+
+
 
   void delete() async {
     MyDialog.circularProgressStart(state.context);
