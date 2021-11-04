@@ -1,5 +1,3 @@
-import 'package:lesson3/model/comment.dart';
-
 enum PhotoSource { CAMERA, GALLERY }
 
 class PhotoMemo {

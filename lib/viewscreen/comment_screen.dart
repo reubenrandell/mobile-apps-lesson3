@@ -59,9 +59,7 @@ class _CommentState extends State<CommentScreen> {
                       decoration: InputDecoration(hintText: 'Comment'),
                       autocorrect: true,
                       //validator: PhotoMemo.validateTitle,
-                      onSaved: (String? value) {
-                        con.saveComment(value, widget.photoMemo.comments);
-                      },
+                      onSaved: con.saveComment
                     ),
                     ElevatedButton(
                       onPressed: () => con.save(widget.photoMemo),
@@ -85,16 +83,14 @@ class _CommentState extends State<CommentScreen> {
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(16.0),
                         ),
-                        child: Text(comment.message as String),
+                        child: Text(comment as String),
                       ),
                     //Here, put text box for leaving comments
                     TextFormField(
                       decoration: InputDecoration(hintText: 'Title'),
                       autocorrect: true,
                       //validator: PhotoMemo.validateTitle,
-                      onSaved: (String? value) {
-                        con.saveComment(value, widget.photoMemo.comments);
-                      },
+                      onSaved: con.saveComment,
                     ),
                     ElevatedButton(
                       onPressed: () => con.save(widget.photoMemo),
@@ -112,20 +108,19 @@ class _CommentState extends State<CommentScreen> {
 class _Controller {
   late _CommentState state;
   late PhotoMemo tempMemo;
-  late Comment tempComment;
+  late String tempComment;
 
   //other variables
   _Controller(this.state);
 
-  void saveComment(String? value, List<dynamic> commentList) async {
+  void saveComment(String? value) {
     //add comment to list
     if (value != null) {
-    } else
-      return;
-    //tempComment = Comment(message: value);
-    commentList.add(Comment(message: value));
-    tempMemo.comments.clear();
-    tempMemo.comments.addAll(commentList);
+      //tempComment = Comment(message: value);
+      // commentList.add(value);
+      // tempMemo.comments.clear();
+      tempMemo.comments.add(value);
+    }
   }
 
   void save(PhotoMemo photoMemo) async {
@@ -146,7 +141,10 @@ class _Controller {
           updateInfo: updateInfo,
         );
         state.widget.photoMemo.assign(tempMemo);
+
       }
+      Navigator.pop(state.context);
+
     } catch (e) {
       if (Constant.DEV) print('====== update photomemo error: $e');
       MyDialog.showSnackBar(
@@ -154,5 +152,7 @@ class _Controller {
         message: 'Update PhotoMemo error. $e',
       );
     }
+
+    // state.render(() => {});
   }
 }
