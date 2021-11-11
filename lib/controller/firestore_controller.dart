@@ -14,12 +14,14 @@ class FirestoreController {
     return ref.id;
   }
 
+
+
    static Future<String> addComment({
-    required PhotoMemo photoMemo,
+    required Comment comment,
 
   }) async {
-    DocumentReference ref = await FirebaseFirestore.instance.collection(Constant.PHOTOMEMO_COLLECTION)
-      .add(photoMemo.toFirestoreDoc());
+    DocumentReference ref = await FirebaseFirestore.instance.collection(Constant.COMMENT_COLLECTION)
+      .add(comment.toFirestoreDoc());
     return ref.id;
   }
 
@@ -103,12 +105,12 @@ class FirestoreController {
   }
 
   static Future<List<Comment>> getPhotoMemoListComments({
-    required String createdBy,
+    required String memoId,
   }) async {
     QuerySnapshot querySnapshot = await FirebaseFirestore.instance
-      .collection(Constant.PHOTOMEMO_COLLECTION)
-      .where(PhotoMemo.CREATED_BY, isEqualTo: createdBy)
-      .orderBy(PhotoMemo.TIMESTAMP, descending: true)
+      .collection(Constant.COMMENT_COLLECTION)
+      .where(Comment.MEMO_ID, isEqualTo: memoId)
+      .orderBy(Comment.TIMESTAMP, descending: true)
       .get();
     var results = <Comment>[];
     querySnapshot.docs.forEach((doc) {

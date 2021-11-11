@@ -173,7 +173,7 @@ class _Controller {
           if (Constant.DEV) print('========== sharedWith error: PAST SECOND LINE');
       Navigator.of(state.context).pop();
     } catch (e) {
-      if (Constant.DEV) print('========== sharedWith error: $e');
+      if (Constant.DEV) print('==++===== sharedWith error: $e');
       MyDialog.showSnackBar(
         context: state.context,
         message: 'Failed to get sharedWith list: $e',

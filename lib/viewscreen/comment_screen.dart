@@ -25,7 +25,12 @@ class CommentScreen extends StatefulWidget {
 class _CommentState extends State<CommentScreen> {
   late _Controller con;
   GlobalKey<FormState> formKey = GlobalKey();
+  late List<Comment> listOfComments;
 
+  setListOfComments(List<Comment> l) {
+    this.listOfComments = l;
+  }
+  
   @override
   void initState() {
     // TODO: implement initState
@@ -37,6 +42,7 @@ class _CommentState extends State<CommentScreen> {
 
   @override
   Widget build(BuildContext context) {
+
     return Scaffold(
         appBar: AppBar(
           title: Text('Comments'),
@@ -77,7 +83,7 @@ class _CommentState extends State<CommentScreen> {
                       context: context,
                       height: MediaQuery.of(context).size.height * 0.35,
                     ),
-                    for (var comment in widget.photoMemo.comments)
+                    for (var comment in listOfComments)
                       Card(
                         elevation: 8.0,
                         shape: RoundedRectangleBorder(
@@ -87,7 +93,7 @@ class _CommentState extends State<CommentScreen> {
                       ),
                     //Here, put text box for leaving comments
                     TextFormField(
-                      decoration: InputDecoration(hintText: 'Title'),
+                      decoration: InputDecoration(hintText: 'Comment'),
                       autocorrect: true,
                       //validator: PhotoMemo.validateTitle,
                       onSaved: con.saveComment,
@@ -107,8 +113,25 @@ class _CommentState extends State<CommentScreen> {
 
 class _Controller {
   late _CommentState state;
-  late PhotoMemo tempMemo;
-  late String tempComment;
+  //late PhotoMemo tempMemo;
+  late Comment tempComment;
+  late List<Comment> listOfComments;
+
+  getListOfComments(PhotoMemo photoMemo, ) async {
+    try {
+      listOfComments = await FirestoreController.getPhotoMemoListComments(memoId: photoMemo.docId!);
+    } catch (e) {
+      print(e);
+      return;
+    }
+
+    state.setListOfComments(listOfComments);
+
+
+
+
+  }
+
 
   //other variables
   _Controller(this.state);
@@ -119,7 +142,7 @@ class _Controller {
       //tempComment = Comment(message: value);
       // commentList.add(value);
       // tempMemo.comments.clear();
-      tempMemo.comments.add(value);
+      tempComment.message = value;
     }
   }
 
@@ -127,29 +150,32 @@ class _Controller {
     FormState? currentState = state.formKey.currentState;
     if (currentState == null || !currentState.validate()) return;
     currentState.save();
+    print('Save method');
 
     try {
       Map<String, dynamic> updateInfo = {};
-      updateInfo[PhotoMemo.COMMENTS] = tempMemo.comments;
+      updateInfo[Comment.MESSAGE] = tempComment.message;
+      updateInfo[Comment.MEMO_ID] = photoMemo.docId;
 
       if (updateInfo.isNotEmpty) {
         // changes have been made
-        tempMemo.timestamp = DateTime.now();
-        updateInfo[PhotoMemo.TIMESTAMP] = tempMemo.timestamp;
-        await FirestoreController.updatePhotoMemo(
-          docId: tempMemo.docId!,
-          updateInfo: updateInfo,
+        tempComment.timestamp = DateTime.now();
+        updateInfo[Comment.TIMESTAMP] = tempComment.timestamp;
+        await FirestoreController.addComment(
+          comment: tempComment,
+          // docId: tempComment.docId!,
+          // updateInfo: updateInfo,
         );
-        state.widget.photoMemo.assign(tempMemo);
+        //state.widget.photoMemo.assign(tempMemo);
 
       }
       Navigator.pop(state.context);
 
     } catch (e) {
-      if (Constant.DEV) print('====== update photomemo error: $e');
+      if (Constant.DEV) print('====== add comment error: $e');
       MyDialog.showSnackBar(
         context: state.context,
-        message: 'Update PhotoMemo error. $e',
+        message: 'add comment error. $e',
       );
     }
 

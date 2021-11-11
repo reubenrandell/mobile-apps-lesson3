@@ -4,12 +4,14 @@ class Comment {
   static const CREATED_BY = 'createdby';
   //static const COMMENT_FILENAME = 'commentfilename';
   static const TIMESTAMP = 'timestamp';
+  static const MEMO_ID = 'memoid';
   //static const SHARED_WITH = 'sharedwith';
 
   String? docId; //Firestore auto generated doc id
   late String createdBy; //email == user id
   late String message;
   late String commentFilename; // image at Cloud Storage; SO May not need this
+  late String memoId;
   DateTime? timestamp;
   //late List<dynamic> sharedWith; // list of emails
   //Add Comment object; Comment includes user left by, message, etc.
@@ -20,6 +22,7 @@ class Comment {
     this.message = '',
     //this.commentFilename = '',
     this.timestamp,
+    this.memoId = '',
     // List<dynamic>? sharedWith,
     // List<dynamic>? imageLabels,
   }) {
@@ -36,6 +39,7 @@ class Comment {
     //this.commentFilename = c.commentFilename;
     // this.photoURL = p.photoURL;
     this.timestamp = c.timestamp;
+    this.memoId = c.memoId;
     // this.sharedWith = [...c.sharedWith];
     // this.imageLabels = [...c.imageLabels];
   }
@@ -47,6 +51,7 @@ class Comment {
     // this.photoFilename = p.photoFilename;
     // this.photoURL = p.photoURL;
     this.timestamp = c.timestamp;
+    this.memoId = c.memoId;
     // this.sharedWith.clear();
     // this.sharedWith.addAll(p.sharedWith);
     // this.imageLabels.clear();
@@ -61,6 +66,7 @@ class Comment {
       // PHOTO_FILENAME: this.photoFilename,
       // PHOTO_URL: this.photoURL,
       TIMESTAMP: this.timestamp,
+      MEMO_ID: this.memoId,
       // SHARED_WITH: this.sharedWith,
       // IMAGE_LABELS: this.imageLabels,
     };
@@ -83,6 +89,7 @@ class Comment {
       timestamp: doc[TIMESTAMP] != null ?
         DateTime.fromMillisecondsSinceEpoch(doc[TIMESTAMP].millisecondsSinceEpoch)
         : DateTime.now(),
+      memoId: doc[MEMO_ID] ??= 'N/A',
 
     );
   }
