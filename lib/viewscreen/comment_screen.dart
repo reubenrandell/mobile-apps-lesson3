@@ -13,7 +13,7 @@ class CommentScreen extends StatefulWidget {
 
   final PhotoMemo photoMemo;
   final User user;
-  final List<Comment> commentList; //Try making not final maybe?
+  List<Comment> commentList; //Try making not final maybe?
 
   CommentScreen({required this.photoMemo, required this.user, required this.commentList});
 
@@ -26,11 +26,11 @@ class CommentScreen extends StatefulWidget {
 class _CommentState extends State<CommentScreen> {
   late _Controller con;
   GlobalKey<FormState> formKey = GlobalKey();
-  late List<Comment> listOfComments;
+  // late List<Comment> listOfComments;
 
-  setListOfComments(List<Comment> l) {
-    this.listOfComments = l;
-  }
+  // setListOfComments(List<Comment> l) {
+  //   this.listOfComments = l;
+  // }
   
   @override
   void initState() {
@@ -55,7 +55,7 @@ class _CommentState extends State<CommentScreen> {
           // ],
         ),
         body: SingleChildScrollView(
-          child: widget.photoMemo.comments.isEmpty
+          child: widget.commentList.isEmpty
               ? Column(
                   children: [
                     Text(
@@ -66,10 +66,10 @@ class _CommentState extends State<CommentScreen> {
                       decoration: InputDecoration(hintText: 'Comment'),
                       autocorrect: true,
                       //validator: PhotoMemo.validateTitle,
-                      onSaved: con.saveComment
+                      onSaved: con.saveComment,
                     ),
                     ElevatedButton(
-                      onPressed: () => con.save(widget.photoMemo),
+                      onPressed: con.save,//(widget.photoMemo), //SAVE FUNCTION
                       child: Text(
                         'Submit Comment',
                         style: Theme.of(context).textTheme.button,
@@ -84,7 +84,7 @@ class _CommentState extends State<CommentScreen> {
                       context: context,
                       height: MediaQuery.of(context).size.height * 0.35,
                     ),
-                    for (var comment in listOfComments)
+                    for (var comment in widget.commentList)
                       Card(
                         elevation: 8.0,
                         shape: RoundedRectangleBorder(
@@ -97,10 +97,10 @@ class _CommentState extends State<CommentScreen> {
                       decoration: InputDecoration(hintText: 'Comment'),
                       autocorrect: true,
                       //validator: PhotoMemo.validateTitle,
-                      onSaved: con.saveComment,
+                      onSaved: con.saveComment, //Save COMMENT FUNCTION
                     ),
                     ElevatedButton(
-                      onPressed: () => con.save(widget.photoMemo),
+                      onPressed: con.save,//(/*widget.photoMemo*/), //SAVE FUNCTION
                       child: Text(
                         'Submit Comment',
                         style: Theme.of(context).textTheme.button,
@@ -125,12 +125,8 @@ class _Controller {
       print(e);
       return;
     }
-
-    state.setListOfComments(listOfComments);
-
-
-
-
+    state.widget.commentList = listOfComments;
+    state.render((){});
   }
 
 
@@ -138,16 +134,21 @@ class _Controller {
   _Controller(this.state);
 
   void saveComment(String? value) {
+
+    print('In save comment function.');
     //add comment to list
     if (value != null) {
-      //tempComment = Comment(message: value);
-      // commentList.add(value);
-      // tempMemo.comments.clear();
+      ////tempComment = Comment(message: value);
+      //// commentList.add(value);
+      //// tempMemo.comments.clear();
+
+
       tempComment.message = value;
+      //state.widget.commentList.add(tempComment);
     }
   }
 
-  void save(PhotoMemo photoMemo) async {
+  void save() async {
     FormState? currentState = state.formKey.currentState;
     if (currentState == null || !currentState.validate()) return;
     currentState.save();
