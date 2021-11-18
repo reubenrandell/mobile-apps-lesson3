@@ -13,8 +13,9 @@ class CommentScreen extends StatefulWidget {
 
   final PhotoMemo photoMemo;
   final User user;
+  final List<Comment> commentList; //Try making not final maybe?
 
-  CommentScreen({required this.photoMemo, required this.user});
+  CommentScreen({required this.photoMemo, required this.user, required this.commentList});
 
   @override
   State<StatefulWidget> createState() {
@@ -114,7 +115,7 @@ class _CommentState extends State<CommentScreen> {
 class _Controller {
   late _CommentState state;
   //late PhotoMemo tempMemo;
-  late Comment tempComment;
+  Comment tempComment = Comment();
   late List<Comment> listOfComments;
 
   getListOfComments(PhotoMemo photoMemo, ) async {
@@ -153,22 +154,30 @@ class _Controller {
     print('Save method');
 
     try {
-      Map<String, dynamic> updateInfo = {};
-      updateInfo[Comment.MESSAGE] = tempComment.message;
-      updateInfo[Comment.MEMO_ID] = photoMemo.docId;
+      tempComment.memoId = state.widget.photoMemo.docId!;
+      tempComment.createdBy = state.widget.user.email!;
+      tempComment.timestamp = DateTime.now();
 
-      if (updateInfo.isNotEmpty) {
-        // changes have been made
-        tempComment.timestamp = DateTime.now();
-        updateInfo[Comment.TIMESTAMP] = tempComment.timestamp;
-        await FirestoreController.addComment(
-          comment: tempComment,
-          // docId: tempComment.docId!,
-          // updateInfo: updateInfo,
-        );
+      String docId = await FirestoreController.addComment(comment: tempComment);
+      tempComment.docId = docId;
+      state.widget.commentList.insert(0, tempComment);
+
+      // Map<String, dynamic> updateInfo = {};
+      // updateInfo[Comment.MESSAGE] = tempComment.message;
+      // updateInfo[Comment.MEMO_ID] = photoMemo.docId;
+
+      // if (updateInfo.isNotEmpty) {
+      //   // changes have been made
+      //   tempComment.timestamp = DateTime.now();
+      //   updateInfo[Comment.TIMESTAMP] = tempComment.timestamp;
+      //   await FirestoreController.addComment(
+      //     comment: tempComment,
+      //     // docId: tempComment.docId!,
+      //     // updateInfo: updateInfo,
+      //   );
         //state.widget.photoMemo.assign(tempMemo);
 
-      }
+      // }
       Navigator.pop(state.context);
 
     } catch (e) {

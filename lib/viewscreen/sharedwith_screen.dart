@@ -1,8 +1,12 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:lesson3/controller/firestore_controller.dart';
+import 'package:lesson3/model/comment.dart';
 import 'package:lesson3/model/constant.dart';
 import 'package:lesson3/model/photomemo.dart';
 import 'package:lesson3/viewscreen/comment_screen.dart';
+import 'package:lesson3/viewscreen/internalerror_screen.dart';
+import 'package:lesson3/viewscreen/view/mydialog.dart';
 import 'package:lesson3/viewscreen/view/webimage.dart';
 
 class SharedWithScreen extends StatefulWidget {
@@ -85,13 +89,24 @@ class _Controller {
   _Controller(this.state);
 
   void comments(PhotoMemo photoMemo) async {
+    try {
+    List<Comment> commentList =
+          await FirestoreController.getPhotoMemoListComments(memoId: photoMemo.docId!);
     await Navigator.pushNamed(
         state.context,
         CommentScreen.routeName,
         arguments: {
           ARGS.USER: state.widget.user,
           ARGS.OnePhotoMemo: photoMemo,
+          ARGS.CommentList: commentList,
         });
+    } catch (e) {
+      if (Constant.DEV) print('==++===== Comments Screen error: $e');
+      MyDialog.showSnackBar(
+        context: state.context,
+        message: 'Failed to get Comments list: $e',
+      );
+    }
     state.render(() {});
   }
 }

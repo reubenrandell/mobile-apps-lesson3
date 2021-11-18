@@ -86,7 +86,8 @@ class Lesson3App extends StatelessWidget {
             var argument = args as Map;
             var user = argument[ARGS.USER];
             var photoMemo = argument[ARGS.OnePhotoMemo];
-            return CommentScreen(user: user, photoMemo: photoMemo);
+            var commentList = argument[ARGS.CommentList];
+            return CommentScreen(user: user, photoMemo: photoMemo, commentList: commentList,);
           }
         },
       },

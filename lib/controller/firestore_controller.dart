@@ -109,16 +109,14 @@ class FirestoreController {
   }) async {
     QuerySnapshot querySnapshot = await FirebaseFirestore.instance
       .collection(Constant.COMMENT_COLLECTION)
-      .where(Comment.MEMO_ID, isEqualTo: memoId)
+      .where(Comment.MEMO_ID, arrayContains: memoId)
       .orderBy(Comment.TIMESTAMP, descending: true)
       .get();
     var results = <Comment>[];
     querySnapshot.docs.forEach((doc) {
-      var p = PhotoMemo.fromFirestoreDoc(doc: doc.data() as Map<String, dynamic>, docId: doc.id);
+      var p = Comment.fromFirestoreDoc(doc: doc.data() as Map<String, dynamic>, docId: doc.id);
       if (p != null)
-        p.comments.forEach((element) {
-          results.add(element);
-      });
+        results.add(p);
       //if (p != null) results.add(p);
     });
     return results;

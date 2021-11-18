@@ -4,6 +4,7 @@ class Constant {
   static const PHOTOMEMO_COLLECTION = 'photomemo_collection';
   static const DARKMODE = true;
   static const COMMENT_COLLECTION = 'comment_collection';
+
 }
 
 enum ARGS {
@@ -12,5 +13,6 @@ enum ARGS {
   Filename,
   PhotoMemoList,
   OnePhotoMemo,
+  CommentList,
   
 }
