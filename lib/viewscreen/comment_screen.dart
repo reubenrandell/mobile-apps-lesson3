@@ -15,7 +15,8 @@ class CommentScreen extends StatefulWidget {
   final User user;
   List<Comment> commentList; //Try making not final maybe?
 
-  CommentScreen({required this.photoMemo, required this.user, required this.commentList});
+  CommentScreen(
+      {required this.photoMemo, required this.user, required this.commentList});
 
   @override
   State<StatefulWidget> createState() {
@@ -26,15 +27,9 @@ class CommentScreen extends StatefulWidget {
 class _CommentState extends State<CommentScreen> {
   late _Controller con;
   GlobalKey<FormState> formKey = GlobalKey();
-  // late List<Comment> listOfComments;
 
-  // setListOfComments(List<Comment> l) {
-  //   this.listOfComments = l;
-  // }
-  
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     con = _Controller(this);
   }
@@ -43,7 +38,7 @@ class _CommentState extends State<CommentScreen> {
 
   @override
   Widget build(BuildContext context) {
-
+    con.getListOfComments(); //testing this; may need to delete.
     return Scaffold(
         appBar: AppBar(
           title: Text('Comments'),
@@ -54,60 +49,65 @@ class _CommentState extends State<CommentScreen> {
           //   ),
           // ],
         ),
-        body: SingleChildScrollView(
-          child: widget.commentList.isEmpty
-              ? Column(
-                  children: [
-                    Text(
-                      'No Comments shared with me',
-                      style: Theme.of(context).textTheme.headline6,
-                    ),
-                    TextFormField(
-                      decoration: InputDecoration(hintText: 'Comment'),
-                      autocorrect: true,
-                      //validator: PhotoMemo.validateTitle,
-                      onSaved: con.saveComment,
-                    ),
-                    ElevatedButton(
-                      onPressed: con.save,//(widget.photoMemo), //SAVE FUNCTION
-                      child: Text(
-                        'Submit Comment',
-                        style: Theme.of(context).textTheme.button,
+        body: Form(
+          key: formKey,
+          child: SingleChildScrollView(
+            child: widget.commentList.isEmpty
+                ? Column(
+                    children: [
+                      Text(
+                        'No Comments shared with me',
+                        style: Theme.of(context).textTheme.headline6,
                       ),
-                    ),
-                  ],
-                )
-              : Column(
-                  children: [
-                    WebImage(
-                      url: widget.photoMemo.photoURL,
-                      context: context,
-                      height: MediaQuery.of(context).size.height * 0.35,
-                    ),
-                    for (var comment in widget.commentList)
-                      Card(
-                        elevation: 8.0,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(16.0),
+                      TextFormField(
+                        decoration: InputDecoration(hintText: 'Comment'),
+                        autocorrect: true,
+                        //validator: PhotoMemo.validateTitle,
+                        onSaved: con.saveComment,
+                      ),
+                      ElevatedButton(
+                        onPressed:
+                            con.save, //(widget.photoMemo), //SAVE FUNCTION
+                        child: Text(
+                          'Submit Comment',
+                          style: Theme.of(context).textTheme.button,
                         ),
-                        child: Text(comment as String),
                       ),
-                    //Here, put text box for leaving comments
-                    TextFormField(
-                      decoration: InputDecoration(hintText: 'Comment'),
-                      autocorrect: true,
-                      //validator: PhotoMemo.validateTitle,
-                      onSaved: con.saveComment, //Save COMMENT FUNCTION
-                    ),
-                    ElevatedButton(
-                      onPressed: con.save,//(/*widget.photoMemo*/), //SAVE FUNCTION
-                      child: Text(
-                        'Submit Comment',
-                        style: Theme.of(context).textTheme.button,
+                    ],
+                  )
+                : Column(
+                    children: [
+                      WebImage(
+                        url: widget.photoMemo.photoURL,
+                        context: context,
+                        height: MediaQuery.of(context).size.height * 0.35,
                       ),
-                    ),
-                  ],
-                ),
+                      for (var comment in widget.commentList)
+                        Card(
+                          elevation: 8.0,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(16.0),
+                          ),
+                          child: Text(comment.message),
+                        ),
+                      //Here, put text box for leaving comments
+                      TextFormField(
+                        decoration: InputDecoration(hintText: 'Comment'),
+                        autocorrect: true,
+                        //validator: PhotoMemo.validateTitle,
+                        onSaved: con.saveComment, //Save COMMENT FUNCTION
+                      ),
+                      ElevatedButton(
+                        onPressed:
+                            con.save, //(/*widget.photoMemo*/), //SAVE FUNCTION
+                        child: Text(
+                          'Submit Comment',
+                          style: Theme.of(context).textTheme.button,
+                        ),
+                      ),
+                    ],
+                  ),
+          ),
         ));
   }
 }
@@ -118,23 +118,25 @@ class _Controller {
   Comment tempComment = Comment();
   late List<Comment> listOfComments;
 
-  getListOfComments(PhotoMemo photoMemo, ) async {
+  _Controller(this.state);
+
+  getListOfComments(
+    // PhotoMemo photoMemo,
+  ) async {
     try {
-      listOfComments = await FirestoreController.getPhotoMemoListComments(memoId: photoMemo.docId!);
+      listOfComments = await FirestoreController.getPhotoMemoListComments(
+          memoId: state.widget.photoMemo.docId!);
     } catch (e) {
       print(e);
       return;
     }
     state.widget.commentList = listOfComments;
-    state.render((){});
+    state.render(() {});
   }
 
-
   //other variables
-  _Controller(this.state);
 
   void saveComment(String? value) {
-
     print('In save comment function.');
     //add comment to list
     if (value != null) {
@@ -142,17 +144,18 @@ class _Controller {
       //// commentList.add(value);
       //// tempMemo.comments.clear();
 
-
       tempComment.message = value;
       //state.widget.commentList.add(tempComment);
     }
   }
 
   void save() async {
-    FormState? currentState = state.formKey.currentState;
-    if (currentState == null || !currentState.validate()) return;
-    currentState.save();
     print('Save method');
+    FormState? currentState = state.formKey.currentState;
+    print('$currentState');
+    if (currentState == null || !currentState.validate()) return;
+    print('Save method');
+    currentState.save();
 
     try {
       tempComment.memoId = state.widget.photoMemo.docId!;
@@ -176,11 +179,10 @@ class _Controller {
       //     // docId: tempComment.docId!,
       //     // updateInfo: updateInfo,
       //   );
-        //state.widget.photoMemo.assign(tempMemo);
+      //state.widget.photoMemo.assign(tempMemo);
 
       // }
       Navigator.pop(state.context);
-
     } catch (e) {
       if (Constant.DEV) print('====== add comment error: $e');
       MyDialog.showSnackBar(

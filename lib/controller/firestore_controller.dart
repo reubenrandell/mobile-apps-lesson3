@@ -104,7 +104,7 @@ class FirestoreController {
     return results;
   }
 
-  static Future<List<Comment>> getPhotoMemoListComments({
+  static Future<List<Comment>> getPhotoMemoListComments({ //memoId is docId of photoMemo
     required String memoId,
   }) async {
     QuerySnapshot querySnapshot = await FirebaseFirestore.instance

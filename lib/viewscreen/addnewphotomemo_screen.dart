@@ -36,6 +36,7 @@ class _AddNewPhotoMemoState extends State<AddNewPhotoMemoScreen> {
   }
 
   void render(fn) => setState(fn);
+  
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -133,7 +134,10 @@ class _Controller {
   _Controller(this.state);
 
   void save() async {
+    print('save function');
     FormState? currentState = state.formKey.currentState;
+    print('$currentState');
+
     if (currentState == null || !currentState.validate()) return;
     currentState.save();
 
@@ -207,14 +211,17 @@ class _Controller {
   }
 
   void saveTitle(String? value) {
+    print('SaveTitle function');
     if (value != null) tempMemo.title = value;
   }
 
   void saveMemo(String? value) {
+    print('SaveMemo function');
     if (value != null) tempMemo.memo = value;
   }
 
   void saveSharedWith(String? value) {
+    print ('SaveTitle function');
     if (value != null && value.trim().length != 0) {
       tempMemo.sharedWith.clear();
       tempMemo.sharedWith.addAll(value.trim().split(RegExp('(,| )+'))); //second parenthesis may actually need to be }
