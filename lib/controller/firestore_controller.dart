@@ -109,7 +109,7 @@ class FirestoreController {
   }) async {
     QuerySnapshot querySnapshot = await FirebaseFirestore.instance
       .collection(Constant.COMMENT_COLLECTION)
-      .where(Comment.MEMO_ID, arrayContains: memoId)
+      .where(Comment.MEMO_ID, isEqualTo: memoId)
       .orderBy(Comment.TIMESTAMP, descending: true)
       .get();
     var results = <Comment>[];
