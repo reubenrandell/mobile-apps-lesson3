@@ -5,7 +5,7 @@ class Comment {
   //static const COMMENT_FILENAME = 'commentfilename';
   static const TIMESTAMP = 'timestamp';
   static const MEMO_ID = 'memoid';
-  //static const SHARED_WITH = 'sharedwith';
+  static const SHARED_WITH = 'sharedwith';
 
   String? docId; //Firestore auto generated doc id
   late String createdBy; //email == user id
@@ -13,7 +13,7 @@ class Comment {
   late String commentFilename; // image at Cloud Storage; SO May not need this
   late String memoId;
   DateTime? timestamp;
-  //late List<dynamic> sharedWith; // list of emails
+  late List<dynamic> sharedWith; // list of emails
   //Add Comment object; Comment includes user left by, message, etc.
 
   Comment({
@@ -23,12 +23,12 @@ class Comment {
     //this.commentFilename = '',
     this.timestamp,
     this.memoId = '',
-    // List<dynamic>? sharedWith,
+    List<dynamic>? sharedWith,
     // List<dynamic>? imageLabels,
   }) {
-    // this.sharedWith = sharedWith == null
-    //     ? []
-    //     : [...sharedWith]; //copies contents of sharedWith
+    this.sharedWith = sharedWith == null
+        ? []
+        : [...sharedWith]; //copies contents of sharedWith
     // this.imageLabels = imageLabels == null ? [] : [...imageLabels];
   }
 
@@ -40,7 +40,7 @@ class Comment {
     // this.photoURL = p.photoURL;
     this.timestamp = c.timestamp;
     this.memoId = c.memoId;
-    // this.sharedWith = [...c.sharedWith];
+    this.sharedWith = [...c.sharedWith];
     // this.imageLabels = [...c.imageLabels];
   }
 
@@ -52,8 +52,8 @@ class Comment {
     // this.photoURL = p.photoURL;
     this.timestamp = c.timestamp;
     this.memoId = c.memoId;
-    // this.sharedWith.clear();
-    // this.sharedWith.addAll(p.sharedWith);
+    this.sharedWith.clear();
+    this.sharedWith.addAll(c.sharedWith);
     // this.imageLabels.clear();
     // this.imageLabels.addAll(p.imageLabels);
   }
@@ -67,7 +67,7 @@ class Comment {
       // PHOTO_URL: this.photoURL,
       TIMESTAMP: this.timestamp,
       MEMO_ID: this.memoId,
-      // SHARED_WITH: this.sharedWith,
+      SHARED_WITH: this.sharedWith,
       // IMAGE_LABELS: this.imageLabels,
     };
   }
@@ -84,7 +84,7 @@ class Comment {
       message: doc[MESSAGE] ??= 'N/A',
       // photoFilename: doc[PHOTO_FILENAME] ??= 'N/A',
       // photoURL: doc[PHOTO_URL] ??= 'N/A',
-      // sharedWith: doc[SHARED_WITH] ??= [],
+      sharedWith: doc[SHARED_WITH] ??= [],
       // imageLabels: doc[IMAGE_LABELS] ??= [],
       timestamp: doc[TIMESTAMP] != null ?
         DateTime.fromMillisecondsSinceEpoch(doc[TIMESTAMP].millisecondsSinceEpoch)
@@ -106,16 +106,18 @@ class Comment {
     return message;
   }
 
-  // static String? validateSharedWith(String? value) {
-  //   if (value == null || value.trim().length == 0) return null;
 
-  //   List<String> emailList =
-  //       value.trim().split(RegExp('(,| )+')).map((e) => e.trim()).toList();
-  //   for (String e in emailList) {
-  //     if (e.contains('@') && e.contains('.'))
-  //       continue;
-  //     else
-  //       return 'Invalid email list: comma or space separated list';
-  //   }
-  // }
+//THIS WAS THE THING THAT I UNCOMMENTED...
+  static String? validateSharedWith(String? value) {
+    if (value == null || value.trim().length == 0) return null;
+
+    List<String> emailList =
+        value.trim().split(RegExp('(,| )+')).map((e) => e.trim()).toList();
+    for (String e in emailList) {
+      if (e.contains('@') && e.contains('.'))
+        continue;
+      else
+        return 'Invalid email list: comma or space separated list';
+    }
+  }
 }

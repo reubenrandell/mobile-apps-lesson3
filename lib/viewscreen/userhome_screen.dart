@@ -8,6 +8,7 @@ import 'package:lesson3/model/comment.dart';
 import 'package:lesson3/model/constant.dart';
 import 'package:lesson3/model/photomemo.dart';
 import 'package:lesson3/viewscreen/addnewphotomemo_screen.dart';
+import 'package:lesson3/viewscreen/comment_screen.dart';
 import 'package:lesson3/viewscreen/detailedview_screen.dart';
 import 'package:lesson3/viewscreen/sharedwith_screen.dart';
 import 'package:lesson3/viewscreen/view/mydialog.dart';
@@ -124,13 +125,7 @@ class _UserHomeState extends State<UserHomeScreen> {
                         trailing: Stack(
                           children: [
                             // Icon(Icons.circle),
-                            Text('${con.photoMemoList[index].numComments.toString()}',
-                              style: TextStyle(
-                                color: Colors.red[800],
-                                fontSize: 18,
-                              ),
-                              
-                            ),
+
                             Icon(Icons.arrow_right),
                           ],
                         ),
@@ -151,6 +146,21 @@ class _UserHomeState extends State<UserHomeScreen> {
                                 'SharedWith: ${con.photoMemoList[index].sharedWith}'),
                             Text(
                                 'Timestamp: ${con.photoMemoList[index].timestamp}'),
+                            Row(
+                              children: [
+                                IconButton(
+                                    onPressed: () =>
+                                        con.comments(con.photoMemoList[index]),
+                                    icon: Icon(Icons.comment)),
+                                Text(
+                                  '${con.photoMemoList[index].numComments.toString()}',
+                                  style: TextStyle(
+                                    color: Colors.red[800],
+                                    fontSize: 18,
+                                  ),
+                                ),
+                              ],
+                            ),
                           ],
                         ),
                         onTap: () => con.onTap(index),
@@ -266,7 +276,12 @@ class _Controller {
         );
       }
       MyDialog.circularProgressStop(state.context);
-      state.render(() => photoMemoList = results);
+      state.render(() {
+        photoMemoList = results;
+        for (int index = 0; index < photoMemoList.length; index++) {
+          getNumComments(index);
+        }
+      });
     } catch (e) {
       if (Constant.DEV) print('===== search error: $e');
       MyDialog.showSnackBar(
@@ -328,13 +343,39 @@ class _Controller {
     //     await FirestoreController.getPhotoMemoListComments(
     //         memoId: photoMemoList[index].docId!);
     await FirestoreController.getPhotoMemoListComments(
-             memoId: photoMemoList[index].docId!).then((value) {photoMemoList[index].numComments = value.length;},);
+            memoId: photoMemoList[index].docId!, email: state.widget.user.email!)
+        .then(
+      (value) {
+        photoMemoList[index].numComments = value.length;
+      },
+    );
     // return commentsList.length.toString();
 
     // if (returnText == null) {
     //   returnText = '0';
     // }
     state.render(() {});
-    
+  }
+
+  void comments(PhotoMemo photoMemo) async {
+    try {
+      List<Comment> commentList =
+          await FirestoreController.getPhotoMemoListComments(
+              memoId: photoMemo.docId!, email: state.widget.user.email!);
+      print('${photoMemo.docId}');
+      await Navigator.pushNamed(state.context, CommentScreen.routeName,
+          arguments: {
+            ARGS.USER: state.widget.user,
+            ARGS.OnePhotoMemo: photoMemo,
+            ARGS.CommentList: commentList,
+          });
+    } catch (e) {
+      if (Constant.DEV) print('==++===== Comments Screen error: $e');
+      MyDialog.showSnackBar(
+        context: state.context,
+        message: 'Failed to get Comments list: $e',
+      );
+    }
+    state.render(() {});
   }
 }

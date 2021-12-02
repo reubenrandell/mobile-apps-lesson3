@@ -90,7 +90,7 @@ class _Controller {
     try {
       List<Comment> commentList =
           await FirestoreController.getPhotoMemoListComments(
-              memoId: photoMemo.docId!);
+              memoId: photoMemo.docId!, email: state.widget.user.email!);
       print('${photoMemo.docId}');
       await Navigator.pushNamed(state.context, CommentScreen.routeName,
           arguments: {

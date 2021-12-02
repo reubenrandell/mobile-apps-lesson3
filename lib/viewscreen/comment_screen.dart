@@ -125,7 +125,7 @@ class _Controller {
   ) async {
     try {
       listOfComments = await FirestoreController.getPhotoMemoListComments(
-          memoId: state.widget.photoMemo.docId!);
+          memoId: state.widget.photoMemo.docId!, email: state.widget.user.email!);
     } catch (e) {
       print(e);
       return;
@@ -137,7 +137,6 @@ class _Controller {
   //other variables
 
   void saveComment(String? value) {
-    print('In save comment function.');
     //add comment to list
     if (value != null) {
       ////tempComment = Comment(message: value);
@@ -150,16 +149,16 @@ class _Controller {
   }
 
   void save() async {
-    print('Save method');
     FormState? currentState = state.formKey.currentState;
     print('$currentState');
     if (currentState == null || !currentState.validate()) return;
-    print('Save method');
     currentState.save();
 
     try {
       tempComment.memoId = state.widget.photoMemo.docId!;
       tempComment.createdBy = state.widget.user.email!;
+      tempComment.sharedWith = state.widget.photoMemo.sharedWith;
+      tempComment.sharedWith.add(tempComment.createdBy);
       tempComment.timestamp = DateTime.now();
 
       String docId = await FirestoreController.addComment(comment: tempComment);

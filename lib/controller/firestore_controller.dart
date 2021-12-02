@@ -106,12 +106,14 @@ class FirestoreController {
 
   static Future<List<Comment>> getPhotoMemoListComments({ //memoId is docId of photoMemo
     required String memoId,
+    required String email,
   }) async {
-    QuerySnapshot querySnapshot = await FirebaseFirestore.instance
-      .collection(Constant.COMMENT_COLLECTION)
-      .where(Comment.MEMO_ID, isEqualTo: memoId)
-      .orderBy(Comment.TIMESTAMP, descending: true)
-      .get();
+      QuerySnapshot querySnapshot = await FirebaseFirestore.instance
+        .collection(Constant.COMMENT_COLLECTION)
+        .where(PhotoMemo.SHARED_WITH, arrayContains: email) //May need something besides this
+        .where(Comment.MEMO_ID, isEqualTo: memoId)
+        .orderBy(Comment.TIMESTAMP, descending: true)
+        .get();
     var results = <Comment>[];
     querySnapshot.docs.forEach((doc) {
       var p = Comment.fromFirestoreDoc(doc: doc.data() as Map<String, dynamic>, docId: doc.id);
