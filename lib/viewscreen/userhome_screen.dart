@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:lesson3/controller/cloudstorage_controller.dart';
 import 'package:lesson3/controller/firebaseauth_controller.dart';
 import 'package:lesson3/controller/firestore_controller.dart';
+import 'package:lesson3/model/comment.dart';
 import 'package:lesson3/model/constant.dart';
 import 'package:lesson3/model/photomemo.dart';
 import 'package:lesson3/viewscreen/addnewphotomemo_screen.dart';
@@ -120,7 +121,19 @@ class _UserHomeState extends State<UserHomeScreen> {
                           url: con.photoMemoList[index].photoURL,
                           context: context,
                         ),
-                        trailing: Icon(Icons.arrow_right),
+                        trailing: Stack(
+                          children: [
+                            // Icon(Icons.circle),
+                            Text('${con.photoMemoList[index].numComments.toString()}',
+                              style: TextStyle(
+                                color: Colors.red[800],
+                                fontSize: 18,
+                              ),
+                              
+                            ),
+                            Icon(Icons.arrow_right),
+                          ],
+                        ),
                         title: Text(con.photoMemoList[index].title),
                         subtitle: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -158,6 +171,9 @@ class _Controller {
 
   _Controller(this.state) {
     photoMemoList = state.widget.photoMemoList;
+    for (int index = 0; index < photoMemoList.length; index++) {
+      getNumComments(index);
+    }
   }
 
   void sharedWith() async {
@@ -170,7 +186,7 @@ class _Controller {
             ARGS.PhotoMemoList: photoMemoList,
             ARGS.USER: state.widget.user,
           });
-          if (Constant.DEV) print('========== sharedWith error: PAST SECOND LINE');
+      if (Constant.DEV) print('========== sharedWith error: PAST SECOND LINE');
       Navigator.of(state.context).pop();
     } catch (e) {
       if (Constant.DEV) print('==++===== sharedWith error: $e');
@@ -180,8 +196,6 @@ class _Controller {
       );
     }
   }
-
-
 
   void delete() async {
     MyDialog.circularProgressStart(state.context);
@@ -306,5 +320,21 @@ class _Controller {
     }
     Navigator.of(state.context).pop();
     Navigator.of(state.context).pop();
+  }
+
+  void getNumComments(int index) async {
+    // var returnText = '0';
+    // List<Comment> commentsList =
+    //     await FirestoreController.getPhotoMemoListComments(
+    //         memoId: photoMemoList[index].docId!);
+    await FirestoreController.getPhotoMemoListComments(
+             memoId: photoMemoList[index].docId!).then((value) {photoMemoList[index].numComments = value.length;},);
+    // return commentsList.length.toString();
+
+    // if (returnText == null) {
+    //   returnText = '0';
+    // }
+    state.render(() {});
+    
   }
 }

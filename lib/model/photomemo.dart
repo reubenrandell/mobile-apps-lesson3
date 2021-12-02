@@ -11,6 +11,7 @@ class PhotoMemo {
   static const SHARED_WITH = 'sharedwith';
   static const IMAGE_LABELS = 'imagelabels';
   static const COMMENTS = 'comments';
+  static const NUM_COMMENTS = 'numComments';
 
   String? docId; //Firestore auto generated doc id
   late String createdBy; //email == user id
@@ -23,6 +24,7 @@ class PhotoMemo {
   late List<dynamic> sharedWith; // list of emails
   late List<dynamic> imageLabels; //ML image labels
   late List<dynamic> comments;
+  late int numComments = 0;
   //Add Comment object; Comment includes user left by, message, etc.
 
   PhotoMemo({
